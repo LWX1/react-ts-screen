@@ -1,0 +1,15 @@
+.layout- {
+    &home {
+        height: 100%;
+        
+    }
+    &header {
+        color: #fff;
+    }
+    &sider {
+        color: #fff;
+    }
+    &body {
+        flex: 1;
+    }
+}

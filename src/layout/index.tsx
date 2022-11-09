@@ -2,10 +2,13 @@ import{ useEffect, useState, Suspense } from "react";
 import { Link, Outlet } from "react-router-dom";
 
 import { Layout, Menu, message } from "antd";
+import './index.scss';
 
 const {Header} = Layout;
 
 const { Sider, Content } = Layout;
+
+
 
 const BaseLayout = () => {
 	
@@ -16,17 +19,17 @@ const BaseLayout = () => {
 
 	// console.log("menuData", menuData, props.location.pathname);
 	return (
-		<Layout className="home">
-			<Header>header</Header>
+		<Layout className="layout-home">
+			<Header className="layout-header">header</Header>
 			<Layout
-				className="body"
+				className="layout-body"
 				style={{
 					background: "#FAFAFA"
 				}}>
-				<Sider className="sider">
+				<Sider className="layout-sider">
 					左边
 				</Sider>
-				<Content className="content">
+				<Content className="layout-content">
 					<Suspense fallback={<p>加载中..</p>}>
 						<Outlet />
 					</Suspense>

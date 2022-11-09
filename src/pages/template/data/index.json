@@ -1,0 +1,29 @@
+{
+    "box": {
+        "width": 500,
+        "height": 500
+    },
+    "blockList": [
+        {
+            "top": 100,
+            "left": 100,
+            "keys": 1,
+            "zIndex": 1,
+            "id": 1
+        },
+        {
+            "top": 300,
+            "left": 300,
+            "keys": 2,
+            "zIndex": 2,
+            "id": 2
+        },
+        {
+            "top": 600,
+            "left": 600,
+            "keys": 3,
+            "zIndex": 3,
+            "id": 3
+        }
+    ]
+}

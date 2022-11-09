@@ -1,0 +1,28 @@
+.flex-box {
+    display: flex;
+}
+
+.flex-box-cloumn {
+    display: flex;
+    flex-direction: column;
+}
+
+.full-height {
+    height: 100%;
+}
+
+div[class^="grid-box"] {
+    display: grid;
+}
+
+.grid-box {
+    &-2 {
+        grid-template-columns: 1fr 1fr;
+    }
+    &-3 {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+    &-4 {
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+    }
+}

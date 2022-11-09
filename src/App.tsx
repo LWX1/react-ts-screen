@@ -4,7 +4,7 @@ import AuthRouter from "./router/AuthRouter";
 
 function App() {
   return (
-    <div className="App">
+    <div className="app">
       <AuthRouter>
         {
           <BaseRouter />

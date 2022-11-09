@@ -1,6 +1,16 @@
-const { override, addWebpackAlias, addBabelPlugin } = require("customize-cra");
+const {
+	override,
+	addWebpackAlias,
+	addBabelPlugin,
+	adjustStyleLoaders,
+} = require("customize-cra");
 const path = require("path");
 const isProductionENV = process.env.NODE_ENV === "production";
+
+// 配置生产环境打包不生成.map文件
+if (isProductionENV) {
+	process.env.GENERATE_SOURCEMAP = false;
+}
 
 module.exports = {
 	webpack: override(
@@ -26,35 +36,18 @@ module.exports = {
 			},
 		]),
 		(config) => {
-			config.optimization.concatenateModules = false;
 			config.optimization.splitChunks = {
-				chunks: "all",
+				chunks: "async",
 				minSize: 30000,
 				minChunks: 2,
 				// maxSize: 500 * 1024,
 				maxAsyncRequests: 5,
 				maxInitialRequests: 3,
 				automaticNameDelimiter: "~",
-				name: true,
+				// name: true,
 				cacheGroups: {
-					echarts: {
-						// chunks: "initial", // initial处理import；async 处理import()；all处理两种
-						// minChunks: 1,
-						name: "echarts",
-						test: /[\\/]node_modules[\\/]echarts[\\/]/,
-						priority: 100,
-						// reuseExistingChunk: true,
-						enforce: true, // 忽略最小最大size 和request 次数等，单独创建
-					},
-					lodash: {
-						// name: "lodash",
-						minChunks: 1,
-						test: /[\\/]node_modules[\\/]lodash[\\/]/,
-						priority: 100,
-						// reuseExistingChunk: true,
-						// enforce: true
-					},
 					moment: {
+						chunks: "all",
 						// chunks: "initial",
 						name: "moment",
 						test: /[\\/]node_modules[\\/]moment[\\/]/,
@@ -71,6 +64,7 @@ module.exports = {
 					},
 
 					rcComponent: {
+						chunks: "all",
 						name: "rcComponent",
 						test: /rc-[a-zA-Z]/,
 						enforce: true,
@@ -84,6 +78,7 @@ module.exports = {
 						enforce: true,
 					},
 					vendors: {
+						chunks: "all",
 						test: /[\\/]node_modules[\\/]/,
 						priority: 10,
 						reuseExistingChunk: true,
@@ -91,6 +86,7 @@ module.exports = {
 					},
 
 					lib: {
+						chunks: "all",
 						name: "lib",
 						minChunks: 2,
 						priority: 20,

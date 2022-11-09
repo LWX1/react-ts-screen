@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
-import { prefixRoute } from "../config/config";
+import { prefixRoute } from "src/config/config";
 
 const AuthRouter = (props: {
 	children: ReactNode

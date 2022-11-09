@@ -1,12 +1,12 @@
 import { lazy } from "react";
-import { prefixRoute } from "../config/config";
+import { prefixRoute } from "src/config/config";
 
 const allRouter = [
 	{
 		name: "主页",
 		path: prefixRoute,
 		index: true,
-		element: lazy(() => import("../pages/home")),
+		element: lazy(() => import("../pages/template")),
 	},
 	{
 		name: "布局",
@@ -18,6 +18,11 @@ const allRouter = [
 			path: prefixRoute + "index",
 			element:  lazy(() => import("../pages/baseMenu")),
 		}]
+	},
+	{
+		name: '模板',
+		path: 'template',
+		element: lazy(() => import("../pages/template"))
 	},
 	{
 		name: '全局',

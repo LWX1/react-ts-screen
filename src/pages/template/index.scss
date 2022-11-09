@@ -1,0 +1,36 @@
+.template {
+    &-container {
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+        height: 100%;
+    }
+    &-header {
+        height: 60px;
+    }
+    &-content {
+        flex: 1;
+        overflow: auto;
+    }
+}
+
+.material-relation {
+    width: 200px;
+    background: yellow;
+}
+
+.data-relation {
+    width: 200px;
+    background: yellow;
+}
+
+.canvas-container {
+    flex: 1;
+    margin: 0 20px;
+    overflow: auto;
+    .canvas-box {
+        background: greenyellow;
+        position: relative;
+        overflow: hidden;
+    }
+}
