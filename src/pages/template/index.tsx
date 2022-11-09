@@ -1,6 +1,6 @@
 import "./index.scss";
 import { registerConfig as config } from "./createEditorConfig";
-import data from "./data/index.json";
+import {Data as data, MouseState} from "./data/index";
 import EditorBlock from "./component/EditorBlock";
 import ProviderEditor from "src/redux/ProviderEditor";
 import MaterialBlock from "./component/MaterialBlock";
@@ -22,10 +22,12 @@ const Template = () => {
 	const [state, dispatch] = useReducer({
 		// 渲染的组件
 		blockList: [],
-		// 选中的组件
-		selectedBlockList: [],
+		xLine: undefined,
+		yLine: undefined,
+		// 鼠标状态
+		mouseState: MouseState.INITIAL,
 	});
-	const { blockList, selectedBlockList } = state;
+	const { blockList, xLine, yLine, mouseState } = state;
 	useEffect(() => {
 		dispatch({
 			blockList: data.blockList,
@@ -39,7 +41,7 @@ const Template = () => {
 		});
 	};
 
-	// 使用物料拖拽
+	// 使用物料拖拽添加组件
 	const [dragStart, dragEnd] = useMaterialDrag({
 		addBlockData,
 		refCanvas,
@@ -47,19 +49,18 @@ const Template = () => {
 	});
 
 	// 更新选中的渲染组件
-	const updateBlockList = (values: any) => {
+	const updateStateData = (values: any) => {
 		dispatch(values)
 	}
 
 	// 选中渲染组件
 	const [mouseDown, clearSelectedBlockList ] = useFocus({
-		updateBlockList, 
+		updateStateData, 
 		blockList, 
-		selectedBlockList
 	});
 
 
-	// 改变某个block的数据
+	// 改变某个组件的数据
 	const changeData = (values: IparamsBlock) => {
 		const data = blockList.map((item: IparamsBlock) => {
 			if (item.id === values.id) {
@@ -106,6 +107,12 @@ const Template = () => {
 							onMouseDown={() => clearSelectedBlockList()}
 						>
 							{BlockList}
+							{
+								mouseState === MouseState.DOWN && xLine && <div className="x-help-line" style={{left: xLine}}/>
+							}
+							{
+								mouseState === MouseState.DOWN &&yLine && <div className="y-help-line" style={{top: yLine}}/>
+							}
 						</div>
 					</div>
 					<div className="data-relation">数据</div>

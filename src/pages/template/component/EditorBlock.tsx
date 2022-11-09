@@ -1,8 +1,8 @@
-import { MouseEventHandler, useContext, useEffect, useRef } from "react";
+import { useContext, useEffect, useRef } from "react";
 import ProviderEditor from "src/redux/ProviderEditor";
 import styled from "styled-components";
 import { IparamsBlock } from "../interfaceIparams";
-import EditorFocus from "./EditorFocus";
+import EditorPoint from "./EditorPoint";
 
 interface Iparams {
 	data: IparamsBlock;
@@ -11,10 +11,10 @@ interface Iparams {
 }
 
 const POINT = {
-    w: 4,
-    h: 4,
-    wSider: 10,
-    hSider: 10
+    w: 5,
+    h: 5,
+    wSider: 12,
+    hSider: 12
 }
 
 const EditorBlockStyle = styled.div`
@@ -30,8 +30,8 @@ const EditorBlockStyle = styled.div`
 	}
 	.shape-point {
 		position: absolute;
-		width: ${POINT.w/2}px;
-		height: ${POINT.h/2}px;
+		width: ${POINT.w}px;
+		height: ${POINT.h}px;
         border-radius: 5px;
         background-color: #fff;
 		&.t {
@@ -92,7 +92,7 @@ const EditorBlock = (props: Iparams) => {
 
 	const refEditor = useRef<HTMLDivElement>(null);
 	const { data, onMouseDown } = props;
-	const { top, left, zIndex, keys, isNew, focus } = data;
+	const { top, left, zIndex, keys, isNew, focus, width, height } = data;
 	const component = componentMap[keys];
 	useEffect(() => {
 		if (isNew) {
@@ -103,6 +103,8 @@ const EditorBlock = (props: Iparams) => {
 					isNew: false,
 					left: left - (clientWidth as number) / 2,
 					top: top - (clientHeight as number) / 2,
+					width: clientWidth,
+					height: clientHeight
 				});
 		}
 	}, [props]);
@@ -113,6 +115,8 @@ const EditorBlock = (props: Iparams) => {
 				top,
 				left,
 				zIndex,
+				width,
+				height
 			}}
             className={focus? 'focus': ''}
 			onMouseDown={(e) => {
@@ -120,7 +124,7 @@ const EditorBlock = (props: Iparams) => {
 			}}
 		>
 			{component.render()}
-			{focus && <EditorFocus />}
+			{focus && <EditorPoint changeData={props.changeData} data={props.data}/>}
 		</EditorBlockStyle>
 	);
 };
