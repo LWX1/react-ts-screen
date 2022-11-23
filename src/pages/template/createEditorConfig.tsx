@@ -23,7 +23,7 @@ export const registerConfig = createEditorConfig();
 registerConfig.register({
     label: '文本',
     preview: () => '预览文本',
-    render: () => <div style={{whiteSpace: 'nowrap'}}>渲染文本</div>,
+    render: () => <div >渲染文本</div>,
     type: 'text',
     keys: 1
 });

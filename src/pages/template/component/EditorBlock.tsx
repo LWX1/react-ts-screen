@@ -19,12 +19,24 @@ const POINT = {
 
 const EditorBlockStyle = styled.div`
 	position: absolute;
-	border: 1px dashed transparent;
+	
 	cursor: pointer;
     &.focus {
-        border-color: #51d6a9;
+       
         cursor: move;
+		&::before {
+			border-color: #51d6a9;
+		}
     }
+	&::before {
+		width: 100%;
+		height: 100%;
+		content: "";
+		position: absolute;
+		border: 1px dashed transparent;
+		left: 0;
+		top: 0;
+	}
 	&:hover {
 		border-color: pink;
 	}
@@ -89,7 +101,6 @@ const EditorBlockStyle = styled.div`
 
 const EditorBlock = (props: Iparams) => {
 	const { componentMap } = useContext(ProviderEditor);
-
 	const refEditor = useRef<HTMLDivElement>(null);
 	const { data, onMouseDown } = props;
 	const { top, left, zIndex, keys, isNew, focus, width, height } = data;
@@ -122,6 +133,7 @@ const EditorBlock = (props: Iparams) => {
 			onMouseDown={(e) => {
 				onMouseDown(e, data);
 			}}
+			onContextMenu={(e) => {e.preventDefault()}}
 		>
 			{component.render()}
 			{focus && <EditorPoint changeData={props.changeData} data={props.data}/>}

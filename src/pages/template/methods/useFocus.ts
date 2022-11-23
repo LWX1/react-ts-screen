@@ -1,237 +1,116 @@
+import { useCallback } from "react";
 import { DirectionsMap, MouseState } from "../data";
 import { IparamsBlock } from "../interfaceIparams";
-
-interface Iparams {
-	updateStateData: Function;
-	blockList: Array<IparamsBlock>;
-}
-
-interface IparamsLine {
-	currentComponent: IparamsBlock;
-	noSelectedBlockList: Array<IparamsBlock>;
-	updateStateData: Function;
-}
-
-interface IparamsLineItemY {
-	lineTop: number;
-	triggerTop: number;
-}
-
-interface IparamsLineItemX {
-	lineLeft: number;
-	triggerLeft: number;
-}
-
-// 偏移量
-const Threshold = 5;
-
-// 获取辅助线
-const getHelpLine = (props: IparamsLine) => {
-	const { currentComponent, noSelectedBlockList } = props;
-
-	const lines: {
-		x: Array<IparamsLineItemX>;
-		y: Array<IparamsLineItemY>;
-	} = {
-		x: [],
-		y: [],
-	};
-	// 计算参考物和当前元素符合辅助线的x,y值
-	noSelectedBlockList.forEach((item) => {
-		DirectionsMap.y.forEach((yItem) => {
-			lines.y.push(yItem.calc(item, currentComponent));
-		});
-		DirectionsMap.x.forEach((xItem) => {
-			lines.x.push(xItem.calc(item, currentComponent));
-		});
-	});
-
-	let yLine: number | undefined;
-	let xLine: number | undefined;
-	let { left, top } = currentComponent;
-
-	// false 为不满足辅助线，则不更新数据
-	let isUpdate = false;
-	for (let i = 0; i < lines.y.length; i++) {
-		const { triggerTop, lineTop } = lines.y[i];
-		// 判断，存在阙值
-		if (Math.abs(top - triggerTop) < Threshold) {
-			// 满足竖辅助线出现条件 为xLine赋值
-			yLine = lineTop;
-			// 实现吸附效果
-			top = triggerTop;
-			isUpdate = true;
-			break;
-		}
-	}
-	for (let j = 0; j < lines.x.length; j++) {
-		const { triggerLeft, lineLeft } = lines.x[j];
-		if (Math.abs(left - triggerLeft) < Threshold) {
-			// 满足竖辅助线出现条件 为xLine赋值
-			xLine = lineLeft;
-			// 实现吸附效果
-			left = triggerLeft;
-			isUpdate = true;
-			break;
-		}
-	}
-	// console.log(xLine, yLine, x, y);
-	return {
-		xLine,
-		yLine,
-		left,
-		top,
-		isUpdate,
-	};
-};
+import useRedux, { ReducersType, useReducersMethod } from "./useRedux";
 
 // 当前组件
 let currentComponent: IparamsBlock;
 
-// 选中的组件列表
-let selectedBlockList: Array<IparamsBlock> = [];
-// 未选中的组件列表
-let noSelectedBlockList: Array<IparamsBlock> = [];
+/**
+ * 选中组件
+ * @param props 
+ * @param callback 点击后回调
+ * @returns 点击事件
+ */
 
-// 更新选中和未选中的组件
-const updateComponentList = (blockList: Array<IparamsBlock>) => {
-	selectedBlockList = blockList.filter((item) => item.focus);
-	noSelectedBlockList = blockList.filter((item) => !item.focus);
-};
-
-export const useFocus = (props: Iparams): Array<Function> => {
-	const { updateStateData, blockList } = props;
-
+export const useFocus = ( callback: Function): Array<Function> => {
+	const [state, dispatch] = useRedux();
+	const [reducersMethod] = useReducersMethod();
 	// 当前鼠标的位置
 	const offset = {
 		x: 0,
 		y: 0,
 	};
-	const documentMouseMove = (e: MouseEvent) => {
+	const documentMouseMove = useCallback((e: MouseEvent) => {
 		// console.log(e)
 		const { pageX, pageY } = e;
 		let deltaX = pageX - offset.x;
 		let deltaY = pageY - offset.y;
 		offset.x = pageX;
 		offset.y = pageY;
-
-		blockList.forEach((item: IparamsBlock) => {
-			if (item.focus) {
-				item.left += deltaX;
-				item.top += deltaY;
-				if (selectedBlockList.length === 1) {
-					currentComponent = item;
-				}
-			}
-		});
+		
+		reducersMethod(ReducersType.MOUSE_MOVE, {
+			deltaX,
+			deltaY
+		})
+		const selectedBlockList = state.blockList.filter((item) => item.focus);
+		const noSelectedBlockList = state.blockList.filter((item) => !item.focus);
+		// console.log(selectedBlockList.length, noSelectedBlockList.length, state.blockList)
 		// 当只有一个选中物体才计算辅助线
 		if (
 			selectedBlockList.length === 1 &&
 			noSelectedBlockList.length !== 0
 		) {
-			const { isUpdate, left, xLine, top, yLine } = getHelpLine({
-				currentComponent,
+
+			
+			reducersMethod({
 				noSelectedBlockList,
-				updateStateData,
+				callback: (
+					data: {
+						isUpdate:boolean, left:number, xLine:number, top:number, yLine:number
+					}
+				) => {
+					const {isUpdate, left, xLine, top, yLine} = data;
+					if (isUpdate) {
+						dispatch({
+							blockList: state.blockList.map((item) => {
+								if (currentComponent.id === item.id) {
+									return {
+										...item,
+										left,
+										top,
+									};
+								}
+								return item;
+							}),
+							xLine,
+							yLine,
+						});
+					} else {
+						dispatch({
+							xLine,
+							yLine,
+							blockList: [...state.blockList],
+						});
+					}
+				}
 			});
-			if (isUpdate) {
-				updateStateData({
-					blockList: blockList.map((item) => {
-						if (currentComponent.id === item.id) {
-							return {
-								...item,
-								left,
-								top,
-							};
-						}
-						return item;
-					}),
-					xLine,
-					yLine,
-				});
-			} else {
-				updateStateData({
-					xLine,
-					yLine,
-					blockList: [...blockList],
-				});
-			}
+			
 		} else {
-			updateStateData({
-				blockList: [...blockList],
+			dispatch({
+				blockList: [...state.blockList],
 			});
 		}
-	};
+	}, [state]);
 
-	const documentMouseUp = (e: Event) => {
-		updateStateData({
+	const documentMouseUp = useCallback((e: Event) => {
+		dispatch({
 			mouseState: MouseState.INITIAL
 		})
 		document.removeEventListener("mousemove", documentMouseMove);
 		document.removeEventListener("mouseup", documentMouseUp);
-	};
-	// 清空选中
-	const clearSelectedBlockList = () => {
-		updateStateData({
-			blockList: blockList.map((item: IparamsBlock) => {
-				item.focus = false;
-				return item;
-			}),
-		});
-	};
+	}, [state]);
+	
 	// 选中渲染组件
-	const mouseDown = (e: any, values: IparamsBlock) => {
+	const mouseDown = useCallback((e: any, blockItem: IparamsBlock) => {
+		
 		e.preventDefault();
 		e.stopPropagation();
-		const selectedList: Array<IparamsBlock> = [];
-		const noSelectedList: Array<IparamsBlock> = [];
-		// 按住shift
-		if (e.shiftKey) {
-			const arr = blockList.map((item: IparamsBlock) => {
-				if (item.id === values.id) {
-					item.focus = !item.focus;
-				}
-				if (item.focus) {
-					selectedList.push(item);
-				} else {
-					noSelectedList.push(item);
-				}
-				return item;
-			});
-			updateStateData({
-				blockList: arr,
-				mouseState: MouseState.DOWN
-			});
-			updateComponentList(arr);
-		} else {
-			// 判断选中多个不更新
-			if (selectedBlockList.length < 2) {
-				const arr = blockList.map((item: IparamsBlock) => {
-					if (item.id === values.id) {
-						item.focus = true;
-					} else {
-						item.focus = false;
-					}
-					if (item.focus) {
-						selectedList.push(item);
-					} else {
-						noSelectedList.push(item);
-					}
-					return item;
-				});
-				updateStateData({
-					blockList: arr,
-					mouseState: MouseState.DOWN
-				});
-				updateComponentList(arr);
-			}
-		}
-		// console.log(e)
+		reducersMethod(ReducersType.MOUSE_DOWN, {
+			ctrlKey: e.ctrlKey,
+			blockItem
+		})
 		offset.x = e.pageX;
 		offset.y = e.pageY;
+		callback && callback(e)
+		// 右键
+		if(e.button === 2) {
+			
+			return;
+		};
 		document.addEventListener("mousemove", documentMouseMove);
 		document.addEventListener("mouseup", documentMouseUp);
-	};
+	}, [state]);
 
-	return [mouseDown, clearSelectedBlockList];
+	return [mouseDown];
 };
