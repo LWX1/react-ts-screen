@@ -100,6 +100,7 @@ const TemplateContainer = () => {
 			/>
 		));
 	}, [blockList]);
+	// console.log('mouseState', mouseState, xLine, yLine)
 	return (
 		<ProviderEditor.Provider value={config}>
 			<div className="template-container">

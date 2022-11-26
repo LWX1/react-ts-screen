@@ -76,7 +76,7 @@ export const reducerSlice = createSlice({
     },
     // 辅助线
     getHelpLine: (state, action) => {
-      const {callback, noSelectedBlockList} = action.payload;
+      const {noSelectedBlockList} = action.payload;
       const lines: {
         x: Array<IparamsLineItemX>;
         y: Array<IparamsLineItemY>;
@@ -84,7 +84,7 @@ export const reducerSlice = createSlice({
         x: [],
         y: [],
       };
-      
+    
       // 计算参考物和当前元素符合辅助线的x,y值
       noSelectedBlockList.forEach((item: IparamsBlock) => {
         DirectionsMap.y.forEach((yItem) => {
@@ -124,13 +124,17 @@ export const reducerSlice = createSlice({
           break;
         }
       }
-      callback({
-        xLine,
-        yLine,
-        left,
-        top,
-        isUpdate,
-      }) ;
+      if(isUpdate)
+        state.blockList.forEach((item) => {
+          if (state.currentComponent.id === item.id) {
+            item.left = left;
+            item.top = top
+            
+          }
+        })
+      state.xLine = xLine;
+      state.yLine =yLine
+      
     },
   }
 })

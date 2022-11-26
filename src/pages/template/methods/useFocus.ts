@@ -3,9 +3,6 @@ import { DirectionsMap, MouseState } from "../data";
 import { IparamsBlock } from "../interfaceIparams";
 import useRedux, { ReducersType, useReducersMethod } from "./useRedux";
 
-// 当前组件
-let currentComponent: IparamsBlock;
-
 /**
  * 选中组件
  * @param props 
@@ -42,38 +39,8 @@ export const useFocus = ( callback: Function): Array<Function> => {
 			noSelectedBlockList.length !== 0
 		) {
 
-			
-			reducersMethod({
+			reducersMethod(ReducersType.GET_HELPLINE, {
 				noSelectedBlockList,
-				callback: (
-					data: {
-						isUpdate:boolean, left:number, xLine:number, top:number, yLine:number
-					}
-				) => {
-					const {isUpdate, left, xLine, top, yLine} = data;
-					if (isUpdate) {
-						dispatch({
-							blockList: state.blockList.map((item) => {
-								if (currentComponent.id === item.id) {
-									return {
-										...item,
-										left,
-										top,
-									};
-								}
-								return item;
-							}),
-							xLine,
-							yLine,
-						});
-					} else {
-						dispatch({
-							xLine,
-							yLine,
-							blockList: [...state.blockList],
-						});
-					}
-				}
 			});
 			
 		} else {
